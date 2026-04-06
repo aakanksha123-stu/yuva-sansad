@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: yuva-sansad
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "daphne -b 0.0.0.0 -p 10000 yuva_sansad.asgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11
