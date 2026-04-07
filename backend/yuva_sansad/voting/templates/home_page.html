@@ -5,6 +5,7 @@
   <title>Yuva Sansad Voting</title>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
   body {
     margin: 0;
@@ -16,7 +17,6 @@
     min-height: 100vh;
     flex-direction: column;
     padding: 10px;
-    box-sizing: border-box;
   }
 
   .container {
@@ -26,20 +26,16 @@
     border-radius: 15px;
     padding: 20px;
     width: 100%;
-    max-width: 400px; /* responsive max width */
+    max-width: 400px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    box-sizing: border-box;
   }
 
   h1 {
     color: orange;
-    font-size: 1.8rem;
-    margin-bottom: 15px;
   }
 
   .question {
     margin: 15px 0;
-    font-size: 1.1rem;
   }
 
   button {
@@ -47,13 +43,7 @@
     margin: 10px 5px;
     border-radius: 25px;
     border: none;
-    font-size: 1rem;
     cursor: pointer;
-    transition: 0.3s;
-  }
-
-  button:hover {
-    opacity: 0.9;
   }
 
   .yes {
@@ -69,49 +59,17 @@
 
   canvas {
     margin-top: 20px;
-    width: 100% !important; /* responsive chart width */
-    height: auto !important;
+    width: 100% !important;
   }
 
   .info {
     margin-top: 8px;
     font-weight: bold;
-    font-size: 0.9rem;
   }
 
   #result {
     margin-top: 10px;
-    font-size: 1.1rem;
     font-weight: bold;
-  }
-
-  /* 📱 MOBILE MEDIA QUERY */
-  @media (max-width: 480px) {
-    .container {
-      padding: 15px;
-    }
-
-    h1 {
-      font-size: 1.5rem;
-    }
-
-    .question {
-      font-size: 1rem;
-    }
-
-    button {
-      padding: 10px 15px;
-      font-size: 0.95rem;
-      margin: 8px 3px;
-    }
-
-    .info {
-      font-size: 0.85rem;
-    }
-
-    #result {
-      font-size: 1rem;
-    }
   }
 </style>
 </head>
@@ -134,28 +92,9 @@
 
   <div id="result"></div>
 
+  <!-- ✅ ONLY ONE CANVAS -->
   <canvas id="voteChart"></canvas>
 </div>
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-
-  <h2>Live Voting System</h2>
-
-  <!-- Buttons -->
-  <button onclick="vote('yes')">YES</button>
-  <button onclick="vote('no')">NO</button>
-
-  <!-- Stats -->
-  <p>Yes: <span id="yesCount">0</span></p>
-  <p>No: <span id="noCount">0</span></p>
-  <p>Users: <span id="users">1</span></p>
-  <p>Timer: <span id="timer">30</span></p>
-  <h3 id="result"></h3>
-
-  <!-- Chart -->
-  <canvas id="voteChart" width="400" height="200"></canvas>
 
   <script>
     console.log("JS Loaded");
