@@ -32,12 +32,13 @@
 
 #     async def send_votes(self, event):
 #         await self.send(text_data=json.dumps(event["votes"]))
-
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 
+# 🌍 Global shared state
 votes = {"yes": 0, "no": 0}
-users_online = 0   # 👥 Track users
+users_online = 0
+
 
 class VoteConsumer(AsyncWebsocketConsumer):
 
@@ -49,7 +50,7 @@ class VoteConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add("voting", self.channel_name)
         await self.accept()
 
-        # 🔄 Send current data to ALL
+        # 🔄 Send latest votes + users to everyone
         await self.channel_layer.group_send(
             "voting",
             {
@@ -66,7 +67,7 @@ class VoteConsumer(AsyncWebsocketConsumer):
 
         await self.channel_layer.group_discard("voting", self.channel_name)
 
-        # 🔄 Update everyone
+        # 🔄 Update all clients
         await self.channel_layer.group_send(
             "voting",
             {
@@ -77,14 +78,21 @@ class VoteConsumer(AsyncWebsocketConsumer):
         )
 
     async def receive(self, text_data):
+        global votes
         data = json.loads(text_data)
 
-        if data["vote"] == "yes":
+        # ✅ Reset votes when timer ends
+        if data.get("action") == "reset":
+            votes = {"yes": 0, "no": 0}
+
+        # 🟢 Normal vote
+        elif data.get("vote") == "yes":
             votes["yes"] += 1
-        else:
+
+        elif data.get("vote") == "no":
             votes["no"] += 1
 
-        # 🔄 Send update to all users
+        # 🔄 Broadcast update to all users
         await self.channel_layer.group_send(
             "voting",
             {
