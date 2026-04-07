@@ -2,6 +2,7 @@ import json
 import asyncio
 from channels.generic.websocket import AsyncWebsocketConsumer
 
+# 🌍 Global State
 votes = {"yes": 0, "no": 0}
 users_online = 0
 time_left = 30
@@ -20,29 +21,32 @@ class VoteConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add("voting", self.channel_name)
         await self.accept()
 
-        # 🚀 start timer only once globally
+        # 🚀 Start timer only once
         if not timer_running:
             timer_running = True
             asyncio.create_task(self.global_timer())
 
-        # 🌍 send current live state to new user
+        # Send current state to this user
         await self.send_state()
 
-        # 👥 update everyone user count
+        # Update everyone
         await self.send_state_to_all()
 
     async def disconnect(self, close_code):
         global users_online
+
         users_online -= 1
+
         await self.channel_layer.group_discard("voting", self.channel_name)
 
         await self.send_state_to_all()
 
     async def receive(self, text_data):
         global votes, voting_closed
+
         data = json.loads(text_data)
 
-        # 🔒 stop votes after timer ends
+        # 🔒 Stop voting if closed
         if voting_closed:
             return
 
@@ -53,22 +57,21 @@ class VoteConsumer(AsyncWebsocketConsumer):
 
         await self.send_state_to_all()
 
-    async def global_timer(self):
-        global time_left, voting_closed, final_result
+    # 🕒 GLOBAL TIMER LOOP
+   async def global_timer(self):
+    global time_left, voting_closed, final_result, votes
 
-        while True:
-            await asyncio.sleep(1)
+    while True:
+        await asyncio.sleep(1)
 
-            if voting_closed:
-                continue
-
+        if not voting_closed:
             time_left -= 1
 
             if time_left <= 0:
                 time_left = 0
                 voting_closed = True
 
-                # 🏆 final result
+                # 🏆 Decide result
                 if votes["yes"] > votes["no"]:
                     final_result = "✅ PASSED"
                 elif votes["no"] > votes["yes"]:
@@ -76,8 +79,19 @@ class VoteConsumer(AsyncWebsocketConsumer):
                 else:
                     final_result = "⚖️ TIE"
 
-            await self.send_state_to_all()
+        else:
+            # ⏳ WAIT 60 SECONDS BEFORE RESET
+            await asyncio.sleep(60)
 
+            # 🔄 Reset for next round
+            votes = {"yes": 0, "no": 0}
+            time_left = 30
+            voting_closed = False
+            final_result = ""
+
+        await self.send_state_to_all()
+
+    # 📤 Send state to one user
     async def send_state(self):
         await self.send(text_data=json.dumps({
             "yes": votes["yes"],
@@ -87,6 +101,7 @@ class VoteConsumer(AsyncWebsocketConsumer):
             "result": final_result
         }))
 
+    # 📡 Broadcast to all
     async def send_state_to_all(self):
         await self.channel_layer.group_send(
             "voting",
@@ -95,5 +110,6 @@ class VoteConsumer(AsyncWebsocketConsumer):
             }
         )
 
+    # 📢 Receive broadcast
     async def broadcast_state(self, event):
         await self.send_state()
