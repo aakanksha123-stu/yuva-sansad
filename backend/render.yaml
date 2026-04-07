@@ -1,7 +1,10 @@
 services:
   - type: web
-    name: yuva-sansad-backend
+    name: yuva-sansad
     env: python
-    buildCommand: pip install --upgrade pip setuptools wheel && pip install -r requirements.txt
+    rootDirectory: backend
+    buildCommand: pip install -r ../requirements.txt
     startCommand: daphne -b 0.0.0.0 -p 10000 yuva_sansad.asgi:application
-    rootDirectory: backend  # where manage.py lives
+    preDeployCommand: |
+      python manage.py migrate
+      python manage.py collectstatic --noinput
