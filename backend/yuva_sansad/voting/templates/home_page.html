@@ -136,58 +136,40 @@
 
   <canvas id="voteChart"></canvas>
 </div>
-
 <script>
   console.log("JS Loaded");
 
   const socket = new WebSocket(
-  window.location.protocol === "https:"
-    ? "wss://" + window.location.host + "/ws/vote/"
-    : "ws://" + window.location.host + "/ws/vote/"
-);
+    windown.      otocol === "https:"
+      ?       ss://" + window.location.host +        s/vote/"
+      : "ws://" + window.loca          ost + "/ws/vote/"
+  );
+
   socket.onopen = () => console.log("✅ Connected");
 
-  let votingClosed = false; // 🔒 control voting
+  let votingClosed = false;
+    let latestData = { yes: 0, no: 0, time: 30 };
 
-  // 🔄 Reset vote when page loads (new session)
+  //     Reset local vote lock onl    on first page load
   sessionStorage.removeItem("voted");
 
   // 📊 Chart
-  const ctx = document.getElementById('voteChart').getContext('2d');
+  const ctx = document.getEl    entById("voteChart").getContext("2d");
 
   const voteChart = new Chart(ctx, {
-    type: 'bar',
+    type: "bar",
     data: {
-      labels: ['YES', 'NO'],
+      labels: [        ES", "NO"],
       datasets: [{
-        label: 'Votes',
+                label: "Votes",
         data: [0, 0],
-        backgroundColor: ['orange', '#ddd'],
+        backgroundColor: ["orange", "#ddd"],
         borderRadius: 10
       }]
     }
   });
 
-  // ⏳ TIMER
-  let time = 30;
-
-  const timerInterval = setInterval(() => {
-    time--;
-    document.getElementById("timer").innerText = time;
-
-    if (time <= 0) {
-      clearInterval(timerInterval);
-      votingClosed = true;
-
-      document.getElementById("result").innerText = "⏰ Voting Closed";
-
-      showFinalResult(); // 🏆 show winner
-    }
-  }, 1000);
-
-  let latestData = { yes: 0, no: 0 };
-
-  // 🔄 Receive data
+  // 🌍 RECEIVE LIVE SHARED STATE
   socket.onmessage = function(e) {
     const data = JSON.parse(e.data);
 
@@ -195,37 +177,34 @@
 
     document.getElementById("yesCount").innerText = data.yes;
     document.getElementById("noCount").innerText = data.no;
+    document.getElementById("users").innerText = data.users || 1;
 
-    // 📊 Update chart
+    // ✅ everyone sees same remaining time
+    document.getElementById("timer").innerText = data.time;
+
+    // 🔒 close voting when time is over
+    votingClosed = data.time <= 0;
+
+    // 📊 update chart
     voteChart.data.datasets[0].data = [data.yes, data.no];
     voteChart.update();
 
-    // 👥 USERS
-    document.getElementById("users").innerText = data.users || 1;
+    // 🏆 show final result from backend
+    document.getElementById("result").innerText = data.result || "";
+
+    // 🔓 allow next round vote after manual refresh
+    if (data.time === 30) {
+      sessionStorage.removeItem("voted");
+    }
   };
 
-  // 🏆 FINAL RESULT
-  function showFinalResult() {
-    if (latestData.yes > latestData.no) {
-      document.getElementById("result").innerText = "✅ PASSED";
-    } 
-    else if (latestData.no > latestData.yes) {
-      document.getElementById("result").innerText = "❌ REJECTED";
-    } 
-    else {
-      document.getElementById("result").innerText = "⚖️ TIE";
-    }
-  }
-
-  // 🟢 VOTE FUNCTION (UPDATED ✅)
+  // 🟢 Vote button
   function vote(choice) {
-
     if (votingClosed) {
       alert("Voting has ended!");
       return;
     }
 
-    // 🔐 One vote per session (fixed)
     if (sessionStorage.getItem("voted")) {
       alert("You already voted!");
       return;
@@ -237,8 +216,6 @@
       vote: choice
     }));
   }
-
 </script>
-
 </body>
 </html>
