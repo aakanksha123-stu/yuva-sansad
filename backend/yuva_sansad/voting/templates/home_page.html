@@ -5,71 +5,115 @@
   <title>Yuva Sansad Voting</title>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    flex-direction: column;
+    padding: 10px;
+    box-sizing: border-box;
+  }
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      flex-direction: column;
-    }
+  .container {
+    text-align: center;
+    background: #ffffff;
+    border: 2px solid orange;
+    border-radius: 15px;
+    padding: 20px;
+    width: 100%;
+    max-width: 400px; /* responsive max width */
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    box-sizing: border-box;
+  }
 
+  h1 {
+    color: orange;
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+  }
+
+  .question {
+    margin: 15px 0;
+    font-size: 1.1rem;
+  }
+
+  button {
+    padding: 12px 20px;
+    margin: 10px 5px;
+    border-radius: 25px;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  button:hover {
+    opacity: 0.9;
+  }
+
+  .yes {
+    background: orange;
+    color: white;
+  }
+
+  .no {
+    background: white;
+    color: orange;
+    border: 2px solid orange;
+  }
+
+  canvas {
+    margin-top: 20px;
+    width: 100% !important; /* responsive chart width */
+    height: auto !important;
+  }
+
+  .info {
+    margin-top: 8px;
+    font-weight: bold;
+    font-size: 0.9rem;
+  }
+
+  #result {
+    margin-top: 10px;
+    font-size: 1.1rem;
+    font-weight: bold;
+  }
+
+  /* 📱 MOBILE MEDIA QUERY */
+  @media (max-width: 480px) {
     .container {
-      text-align: center;
-      background: #ffffff;
-      border: 2px solid orange;
-      border-radius: 15px;
-      padding: 30px;
-      width: 400px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      padding: 15px;
     }
 
     h1 {
-      color: orange;
+      font-size: 1.5rem;
     }
 
     .question {
-      margin: 20px 0;
+      font-size: 1rem;
     }
 
     button {
-      padding: 12px 25px;
-      margin: 10px;
-      border-radius: 25px;
-      border: none;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    .yes {
-      background: orange;
-      color: white;
-    }
-
-    .no {
-      background: white;
-      color: orange;
-      border: 2px solid orange;
-    }
-
-    canvas {
-      margin-top: 20px;
+      padding: 10px 15px;
+      font-size: 0.95rem;
+      margin: 8px 3px;
     }
 
     .info {
-      margin-top: 10px;
-      font-weight: bold;
+      font-size: 0.85rem;
     }
 
     #result {
-      margin-top: 10px;
-      font-size: 18px;
+      font-size: 1rem;
     }
-  </style>
+  }
+</style>
 </head>
 
 <body>
